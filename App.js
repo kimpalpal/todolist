@@ -1,74 +1,185 @@
-import React, { useState } from "react";
-import "./App.css";
+import {useState} from "react";
+import './App.css';
+import uuid from 'react-uuid';
 
-const App = () => {
-  const [users, setUsers] = useState([
-    { id: 1, task: "리액트공부하기", name: "끝까지포기하지않기" },
+
+function App() {
+  
+  const [title,setTitle] = useState("");
+  const [contents,setContents] = useState("");
+
+  const [todos, setTodos] =useState([
+    {
+      id: uuid(),
+      title:'제목1',
+      contents:'내용1',
+      isDone:false,
+    },
+    {
+      id: uuid(),
+      title:'제목2',
+      contents:'내용2',
+      isDone:true,
+    },
+    {
+      id:uuid(),
+      title:'제목3',
+      contents:'내용3',
+      isDone:false,
+    },
+    {
+      id:uuid(),
+      title:'제목4',
+      contents:'내용4',
+      isDone:false,
+    }
   ]);
 
-  const [name, setName] = useState("");
-  const [task, setTask] = useState("");
-  const [doneTodo, setDoneTodo] = useState([]);
+  const todoList = todos.filter(function (todo){
+    return todo.isDone === false;
+  }); // 할일 목록
 
-  const nameChangeHandler = (event) => {
-    setName(event.target.value);
-  };
-
-  const taskChangeHandler = (event) => {
-    setTask(event.target.value);
-  };
-
-  // 추가 버튼클릭
-  const clickAddButtonHandler = () => {
-    const newUser = {
-      id: users.length + 1,
-      task: task,
-      name: name,
-    };
-    setUsers([...users, newUser]);
-  };
-
-  //삭제 버튼 클릭
-  const clickRemoveHandler = (id) => {
-    const newUsers = users.filter((user) => user.id !== id);
-    setUsers(newUsers);
-  };
+  
+  const doneList = todos.filter(function (todo){
+    return todo.isDone === true;
+  }); // 할일 목록
 
   return (
     <div>
-      <header className="header-style">
-        <h1>Todo List</h1>
+      <header
+      style={{
+        backgroundColor:'#f7e9c3',
+        padding:"10px",
+      }}
+      >헤더
       </header>
+      <main
+        style={{
+        backgroundColor:'#afdeb2',
+        padding:"10px",
+      }}>
+        <div>
+  <form 
+      onSubmit={(event) => {
+        event.preventDefault();
+        const newTodo = {
+          id: uuid(),
+          title: title,
+          contents : contents,
+          isDone: false,
+        };
 
-      <div className="input-style">
-        <div className="input">
-          할일:&nbsp; <input value={name} onChange={nameChangeHandler}></input>
-          메모 : <input value={task} onChange={taskChangeHandler}></input>
-          <br></br>
+        setTodos([...todos, newTodo]);
+      }}
+      >
+        <input value={title} onChange={(event)=>{
+        setTitle(event.target.value);
+        }}/>
+        <input value={contents} onChange={(event)=>{
+        setContents(event.target.value);
+        }}/>
+        <button type="submit">입력</button>
+      </form>          
+      </div>
+
+        <div>
+          <h1>리스트영역</h1>
+          <div> 
+            <h2>할일 목록</h2>
+            {todoList.map(function (todo){
+            return(
+              <div
+                key={todo.id}
+                style={{
+                border:'1px solid black',
+                margin:'10px',
+                paddingLeft:"10px",
+                paddingBottom:"20px",
+              }}>
+                <p>{todo.id}</p>
+                <h3>{todo.title}</h3>
+                <p>{todo.contents}</p>
+                <p>완료여부 : {todo.isDone.toString()}</p> 
+                <button 
+                onClick={() => {
+                  const newTodos = todos.map ((item) => {
+                    if (item.id === todo.id) {
+                      return {
+                        ...item, isDone :!item.isDone,
+                      };
+                    } else {
+                      return item;
+                    }
+                  });
+                  setTodos(newTodos);
+
+                }}>완료 </button>
+                <button onClick={()=>{
+                  const deletedTodos = todos.filter(item=>{
+                    return item.id !== todo.id
+                  });
+
+                  setTodos(deletedTodos);
+                }}  >삭제 </button>
+              </div>
+            );
+          })}
+          </div>          
+          <div> 
+            <h2>완료된 목록</h2>
+            {doneList.map(function (todo){
+            return(
+              <div
+                key={todo.id}
+                style={{
+                border:'1px solid black',
+                margin:'10px',
+                paddingLeft:"10px",
+                paddingBottom:"20px",
+              }}>
+                <p>{todo.id}</p>
+                <h3>{todo.title}</h3>
+                <p>{todo.contents}</p>
+                <p>완료여부 : {todo.isDone.toString()}</p> 
+                <button 
+                onClick={() => {
+                  const newTodos = todos.map ((item) => {
+                    if (item.id === todo.id) {
+                      return {
+                        ...item, isDone :!item.isDone,
+                      };
+                    } else {
+                      return item;
+                    }
+                  });
+                  setTodos(newTodos);
+
+                }}>완료 취소  </button>
+                <button onClick={()=>{
+                  const deletedTodos = todos.filter(item=>{
+                    return item.id !== todo.id
+                  });
+
+                  setTodos(deletedTodos);
+                }}  >삭제</button>
+              </div>
+            );
+          })}
+          </div>
+
+          
         </div>
-        <button className="btn" onClick={clickAddButtonHandler}>
-          추가{" "}
-        </button>
-      </div>
-
-      <h3>Working.. 🔥</h3>
-      <div className="app-style">
-        {users.map(function (item) {
-          return (
-            <div key={item.id} className="component-styel">
-              <b>{item.task}</b>
-              {item.name}
-              <button onClick={() => clickRemoveHandler(item.id)}>삭제</button>
-              <button>완료</button>
-            </div>
-          );
-        })}
-      </div>
-      <div className="doneList">
-        <h3>Done.. 🔥</h3>
-      </div>
+        </main>
+      <footer
+        style={{
+          backgroundColor:'#b5afde',
+          padding:"10px",
+        }}
+      >푸터
+      </footer>
+      
     </div>
   );
-};
+}
 
 export default App;
